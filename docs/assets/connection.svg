@@ -1,0 +1,64 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="900" height="420" viewBox="0 0 900 420" role="img" aria-labelledby="title desc">
+  <title id="title">WT9932P4C61-TINY USB 扩展屏接线示意</title>
+  <desc id="desc">Mac 通过 FUSB J9 连接开发板用于烧录和串口，通过 HUSB J10 的 USB 2.0 High-Speed 链路发送视频；开发板以两条数据通道的 MIPI DSI 连接 WX101CH021I-40Z 屏幕。Mac 横向桌面为 1280 乘 800，屏幕原生分辨率为 800 乘 1280。本图不表示 PCB 布局或具体引脚。</desc>
+  <defs>
+    <marker id="arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+      <path d="M 0 0 L 10 5 L 0 10 z" fill="#155e75"/>
+    </marker>
+    <style>
+      text { font-family: -apple-system, BlinkMacSystemFont, "PingFang SC", "Microsoft YaHei", sans-serif; fill: #172b3a; }
+      .heading { font-size: 24px; font-weight: 700; }
+      .label { font-size: 16px; font-weight: 600; }
+      .small { font-size: 13px; }
+      .note { font-size: 14px; fill: #425466; }
+      .card { fill: #f8fafc; stroke: #9aabb8; stroke-width: 1.5; }
+      .link { fill: none; stroke: #155e75; stroke-width: 3; marker-end: url(#arrow); }
+    </style>
+  </defs>
+  <rect width="900" height="420" fill="#fff"/>
+  <text x="28" y="35" class="heading">USB 扩展屏接线示意</text>
+  <text x="28" y="61" class="note">横向桌面 1280×800 → USB 视频 → 原生屏幕 800×1280</text>
+
+  <!-- Functional blocks only; not physical PCB or connector locations. -->
+  <rect x="24" y="94" width="205" height="215" rx="12" class="card"/>
+  <rect x="46" y="116" width="161" height="106" rx="5" fill="#fff" stroke="#425466" stroke-width="2"/>
+  <rect x="55" y="125" width="143" height="88" fill="#e9f2f5"/>
+  <text x="126" y="177" text-anchor="middle" font-size="25" font-weight="700">Mac</text>
+  <path d="M 38 227 H 215 L 204 237 H 49 Z" fill="#dce5eb" stroke="#425466" stroke-width="1.5"/>
+  <text x="126" y="266" text-anchor="middle" class="label">横向扩展桌面</text>
+  <text x="126" y="289" text-anchor="middle" class="small">1280×800</text>
+
+  <rect x="335" y="94" width="250" height="215" rx="12" class="card"/>
+  <text x="460" y="127" text-anchor="middle" class="label">WT9932P4C61-TINY</text>
+  <rect x="407" y="155" width="106" height="70" rx="7" fill="#e9f2f5" stroke="#638092" stroke-width="1.5"/>
+  <text x="460" y="185" text-anchor="middle" class="label">ESP32-P4</text>
+  <text x="460" y="208" text-anchor="middle" class="small">JPEG 解码 / 显示</text>
+  <text x="460" y="263" text-anchor="middle" class="small">功能示意，非实物布局</text>
+  <text x="460" y="285" text-anchor="middle" class="small">C61 不在本固件操作范围</text>
+  <rect x="331" y="141" width="12" height="20" rx="2" fill="#fff" stroke="#155e75" stroke-width="1.5"/>
+  <rect x="331" y="235" width="12" height="20" rx="2" fill="#fff" stroke="#155e75" stroke-width="1.5"/>
+
+  <path d="M 230 151 H 329" class="link"/>
+  <text x="282" y="117" text-anchor="middle" class="small" font-weight="700">FUSB J9</text>
+  <text x="282" y="136" text-anchor="middle" class="small">烧录 / 串口</text>
+  <path d="M 230 245 H 329" class="link"/>
+  <text x="282" y="210" text-anchor="middle" class="small" font-weight="700">HUSB J10</text>
+  <text x="282" y="229" text-anchor="middle" font-size="12">USB 2.0 HS 视频</text>
+
+  <path d="M 586 180 H 689" class="link"/>
+  <text x="638" y="155" text-anchor="middle" class="small" font-weight="700">MIPI DSI</text>
+  <text x="638" y="206" text-anchor="middle" class="small">2 lane</text>
+
+  <rect x="692" y="94" width="184" height="215" rx="12" class="card"/>
+  <text x="784" y="119" text-anchor="middle" font-size="13" font-weight="600">WX101CH021I-40Z</text>
+  <rect x="734" y="134" width="100" height="137" rx="3" fill="#fff" stroke="#425466" stroke-width="2"/>
+  <rect x="741" y="141" width="86" height="123" fill="#e9f2f5"/>
+  <text x="784" y="198" text-anchor="middle" class="label">10.1 寸</text>
+  <text x="784" y="223" text-anchor="middle" class="small">800×1280</text>
+  <text x="784" y="291" text-anchor="middle" class="small">MIPI 屏幕与转接板</text>
+
+  <path d="M 28 331 H 872" stroke="#d4dde4" stroke-width="1"/>
+  <text x="28" y="356" class="note">接线与供电请按本板原理图及对应屏幕转接板资料确认；本图不指定引脚或供电来源。</text>
+  <text x="28" y="380" class="note">已知屏幕转接板使用 3.3V；DSI PHY 的 2.5V 配置不是屏幕供电。</text>
+  <text x="28" y="404" class="note">接口位置仅为排版示意；请核对实物上的 FUSB / HUSB 丝印和对应原理图。</text>
+</svg>

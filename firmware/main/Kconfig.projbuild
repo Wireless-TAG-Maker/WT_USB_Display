@@ -1,0 +1,41 @@
+menu "WX101CH021I-40Z bring-up"
+config SCREEN_ENABLE_DISPLAY
+    bool "Enable the exact-model DSI color-bar trial"
+    default n
+    depends on IDF_TARGET_ESP32P4
+    help
+        Send the WX101CH021I-40Z 2-lane vendor initialization sequence
+        and display a framebuffer color-bar pattern. Requires PSRAM.
+        Backlight, hardware reset and touch control are not configured.
+config SCREEN_ENABLE_BENCHMARK
+    bool "Run the official LVGL 8 benchmark"
+    default n
+    depends on SCREEN_ENABLE_DISPLAY
+    depends on !SCREEN_ENABLE_USB_DISPLAY
+    help
+        Use an RGB565 framebuffer and the P4 v3 bridge's RGB888 output
+        conversion. Run the unmodified LVGL 8 benchmark at maximum speed.
+config SCREEN_ENABLE_TOUCH_PROBE
+    bool "Enable the JD9032 touch test and benchmark launcher"
+    default n
+    depends on SCREEN_ENABLE_BENCHMARK
+    help
+        Identify the controller at I2C address 0x68 and use the first finger
+        as an LVGL pointer. The benchmark can be started with a touch button.
+        No controller control registers or reset GPIOs are written.
+config SCREEN_TOUCH_LATENCY_MARKER
+    bool "Measure latency with the board RGB LED and camera"
+    default n
+    depends on SCREEN_ENABLE_TOUCH_PROBE
+    help
+        Use the board's GPIO51 WS2812 and a synchronous screen patch as
+        an external camera timing reference. Temporary diagnostic mode.
+config SCREEN_ENABLE_USB_DISPLAY
+    bool "Receive USB High-Speed JPEG frames from the Mac extended display"
+    default n
+    depends on SCREEN_ENABLE_DISPLAY
+    help
+        HUSB carries a vendor bulk stream. Decode complete JPEG frames with
+        the P4 hardware codec and hand off three packed BGR24 (RGB888)
+        framebuffers.
+endmenu

@@ -1,0 +1,9 @@
+dependencies:
+  lvgl/lvgl:
+    version: "==8.4.0"
+  espressif/led_strip:
+    version: "==3.0.3"
+  espressif/esp_tinyusb:
+    version: "==2.3.0"
+  espressif/tinyusb:
+    version: "==0.21.0~6"
