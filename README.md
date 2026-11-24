@@ -14,6 +14,7 @@ P4 硬件解码后驱动原生800×1280面板。窗口可通过macOS移入副屏
 | --- | --- |
 | ESP-IDF 固件 | [firmware/README.md](firmware/README.md)：接线、构建、烧录、协议及各测试配置 |
 | macOS App | [host/macos/README.md](host/macos/README.md)：依赖、构建、录屏授权及使用截图 |
+| Windows 扩展桌面验证 | 构建投送工具、启动副屏和用 UVC 摄像头测帧率，见 [Windows 验证说明](scripts/windows/README.md) |
 | 协作指引 | [AGENTS.md](AGENTS.md)，另提供 [agent.md](agent.md) 入口 |
 
 ```text
