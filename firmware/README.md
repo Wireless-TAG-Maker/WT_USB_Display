@@ -113,6 +113,7 @@ JPEG直接解码为 **RGB888/BGR24**，低地址字节顺序为B、G、R，不�
 协议唯一字段定义见 [main/usb_screen_protocol.h](main/usb_screen_protocol.h)：
 
 - 开发测试VID:PID为 **CAFE:4011**；接口0，bulk OUT `0x01`、IN `0x81`。
+- HUSB 通过 BOS 公布 Microsoft OS 2.0 描述符，Windows 可为该接口自动绑定系统自带的 WinUSB 驱动。
 - 控制请求 `0xC1/0x01` 读取32B `WP4H` HELLO。
 - 每帧为32B `WP4D`头加JPEG，所有整数小端，载荷最多768KiB；CRC为IEEE CRC32，与 `zlib crc32(0, …)` 一致。
 - JPEG必须是实际800×1280、8位baseline、单扫描YCbCr，分量ID为1/2/3；支持4:4:4/4:2:2/4:2:0。仅修改EXIF方向不能代替像素旋转。
