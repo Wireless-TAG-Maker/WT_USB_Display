@@ -1,6 +1,6 @@
 # WT_USB_Display 固件
 
-面向 **WT9932P4C61-TINY + WX101CH021I-40Z** 的独立 ESP-IDF 工程。主要用途是接收配套 Mac 程序发送的 JPEG，在 MIPI 屏上显示扩展桌面。首次使用优先选择下面的 `usb_display` 配置；它需要配套主机程序，主机端说明见 [macOS README](../host/macos/README.md)。
+面向 **WT9932P4C61-TINY + WX101CH021I-40Z** 的独立 ESP-IDF 工程。固件接收上位机发送的 JPEG，在 MIPI 屏上显示扩展桌面。首次使用优先选择下面的 `usb_display` 配置。主机端的构建与连接步骤见 [macOS 说明](../host/macos/README.md)和 [Windows 说明](../host/windows/README.md)。
 
 ## 硬件与连接
 

@@ -1,8 +1,8 @@
 # WT_USB_Display
 
 基于 **WT9932P4C61-TINY（ESP32-P4）+ 10.1寸 MIPI 屏** 的 USB 副屏工程。
-Mac App 创建真正的 **1280×800 系统扩展桌面**，通过 USB2.0 High-Speed 发送 JPEG，
-P4 硬件解码后驱动原生800×1280面板。窗口可通过macOS移入副屏。
+macOS 和 Windows 上位机将系统扩展桌面通过 USB 2.0 High-Speed 发送给 P4。
+P4 硬件解码 JPEG 后驱动原生 800×1280 面板。macOS App 的桌面为 1280×800，Windows 使用驱动支持的 16∶10 横向模式。
 
 ![RGB888实体屏渐变与主色显示](docs/assets/display-gradient.png)
 
@@ -13,19 +13,22 @@ P4 硬件解码后驱动原生800×1280面板。窗口可通过macOS移入副屏
 | 内容 | 目录与说明 |
 | --- | --- |
 | ESP-IDF 固件 | [firmware/README.md](firmware/README.md)：接线、构建、烧录、协议及各测试配置 |
-| macOS App | [host/macos/README.md](host/macos/README.md)：依赖、构建、录屏授权及使用截图 |
-| Windows 扩展桌面验证 | 构建投送工具、启动副屏和用 UVC 摄像头测帧率，见 [Windows 验证说明](scripts/windows/README.md) |
+| macOS | [App 源码、构建与录屏授权](host/macos/README.md) · [启动检查与 CPU 采样](scripts/macos/README.md) |
+| Windows | [上位机源码、构建与投送](host/windows/README.md) · [UVC 实拍帧率验证](scripts/windows/README.md) |
 | 协作指引 | [AGENTS.md](AGENTS.md)，另提供 [agent.md](agent.md) 入口 |
 
 ```text
 firmware/          ESP-IDF 6.0.2工程、固定配置与依赖锁
-host/macos/        Swift/AppKit上位机与离线检查
-scripts/           构建、串口分析和性能验证工具
-docs/assets/       必要的接线图、真实界面截图与实拍
+host/macos/        Swift/AppKit 上位机与 Swift 离线检查
+host/windows/      Windows 桌面捕获与 WinUSB 投送
+scripts/           共用的固件构建和串口基准工具
+  macos/           macOS 启动检查与进程 CPU 采样
+  windows/         Windows 扩展桌面和 UVC 帧率验证
+docs/assets/       共用的接线图与实体屏实拍
+  macos/           macOS 构建、授权和显示设置截图
 ```
 
-仓库只纳入这两个源码工程及配套工具/文档。构建产物、托管组件、SDK、原始录像、下载资料、
-本机日志和临时诊断草稿均由 `.gitignore` 排除，不需要下载这些内容才能构建。
+构建产物、托管组件、SDK、原始录像、下载资料、本机日志和临时诊断草稿均由 `.gitignore` 排除。
 
 ## 硬件与连接
 
@@ -39,6 +42,8 @@ docs/assets/       必要的接线图、真实界面截图与实拍
 - 当前程序不操作C61，USB副屏模式不提供触摸回传或音频。
 
 ## 快速开始
+
+两端共用下面的 P4 固件。Windows 用户完成第一步后，按 [Windows 构建与启动说明](host/windows/README.md)连接扩展桌面。
 
 ### 1. 构建并烧录固件
 
@@ -65,16 +70,16 @@ open host/macos/build/WTUSBDisplay.app --args --fps 60 --quality 0.72
 依赖安装、App路径、首次授权及参数详见[App README](host/macos/README.md)。
 录屏授权必须授予实际启动的当前App；命令行检查成功不能代替正常App身份授权。
 
-### 3. 授权并使用扩展桌面
+### 3. 在 macOS 授权并使用扩展桌面
 
 在“系统设置 → 隐私与安全 → 录屏与系统录音”的上方列表开启 `WTUSBDisplay.app`。
 若未出现，点击添加并选择已构建的App，再按系统提示重新打开它。
 
-![上方录屏列表中的WTUSBDisplay授权](docs/assets/macos-screen-recording.png)
+![上方录屏列表中的WTUSBDisplay授权](docs/assets/macos/screen-recording.png)
 
 系统“显示器”页面应看到 **WT P4 USB Display / 扩展显示器 / 1280×800**。
 
-![WT系统扩展显示设置](docs/assets/macos-extended-display.png)
+![WT系统扩展显示设置](docs/assets/macos/extended-display.png)
 
 将窗口移入该扩展屏即可使用。退出App会移除虚拟显示器，由macOS重新安置其上的窗口。
 

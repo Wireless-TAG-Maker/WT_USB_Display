@@ -36,7 +36,7 @@ for marker in (21, 33, 9, 46):
     if not cv.imwrite(str(directory / f"mark-{marker}.png"), cv.aruco.generateImageMarker(dictionary, marker, 120)):
         raise OSError("Cannot write calibration markers")
 PY
-topology=$(wslpath -w "$src/../topology.py")
+topology=$(wslpath -w "$src/../../../host/windows/topology.py")
 py.exe -3 "$topology" > "$output/before.json"
 "$py" "$src/sample.py" "$session" "$output" current 35 --port "$port"
 "$py" "$src/sample.py" "$session" "$output" controlled 96 --port "$port" &

@@ -37,7 +37,7 @@ bash host/macos/build.sh --test
 这些检查使用合成像素，不访问 USB、不创建显示器，也不请求录屏权限。
 只需构建时可省略 `--test`。不需要下载 `vendor` 或原始屏幕资料目录。
 
-![构建完成后的WTUSBDisplay.app](../../docs/assets/macos-app-build.png)
+![构建完成后的WTUSBDisplay.app](../../docs/assets/macos/app-build.png)
 
 ## 接线与正常使用
 
@@ -62,15 +62,15 @@ open host/macos/build/WTUSBDisplay.app --args --fps 60 --quality 0.72
 App 实际只捕获新显示器，不默认捕获主屏，也不采集音频。
 权限设置可参考 [Apple 官方说明](https://support.apple.com/guide/mac-help/control-access-screen-system-audio-recording-mchld6aa7d23/mac)。
 
-![在上方录屏列表授权当前App](../../docs/assets/macos-screen-recording.png)
+![在上方录屏列表授权当前App](../../docs/assets/macos/screen-recording.png)
 
 授权后，在“系统设置 → 显示器”选择WT P4 USB Display，确认用途为扩展显示器、分辨率1280×800：
 
-![扩展模式和分辨率](../../docs/assets/macos-extended-display.png)
+![扩展模式和分辨率](../../docs/assets/macos/extended-display.png)
 
 点击“排列…”可查看当前主屏与副屏位置。默认副屏位于主屏右侧；这里展示当前排列示例：
 
-![显示器排列示例](../../docs/assets/macos-display-arrangement.png)
+![显示器排列示例](../../docs/assets/macos/display-arrangement.png)
 
 通过 App 菜单的 **Quit WT USB Display** 或 `⌘Q` 退出。
 退出、SIGINT/SIGTERM、运行时限结束或连接错误会停止传输并移除虚拟屏；
@@ -118,6 +118,8 @@ APP=host/macos/build/WTUSBDisplay.app/Contents/MacOS/WTUSBDisplay
 `--synthetic` 验证设备流链路，不能替代真实扩展桌面性能验证。
 
 ## 性能与日志的含义
+
+启动与退出检查、进程 CPU 和帧率日志采样命令见 [macOS 验证工具](../../scripts/macos/README.md)。
 
 流水线使用独立的捕获、编码、USB 写入与 ACK 读取任务；待处理帧只保留最新一帧，避免无限积压。
 日志每秒报告 `capture_fps`、`encode_fps`、`sent_fps`、`present_ack_fps`，

@@ -1,11 +1,12 @@
 # 开发协作指引
 
-本仓库只维护ESP32-P4 USB副屏固件、macOS上位机及其构建/验证工具。默认使用中文沟通。
+本仓库维护 ESP32-P4 USB 副屏固件、macOS 和 Windows 上位机及其验证工具。默认使用中文沟通。
 
 ## 修改入口
 
 - 固件、显示时序、JPEG、USB或触摸改动前，阅读 [firmware/README.md](firmware/README.md) 和对应模块；协议字段以 `firmware/main/usb_screen_protocol.h` 为唯一来源。
 - Mac捕获、编码、虚拟屏或打包改动前，阅读 [host/macos/README.md](host/macos/README.md) 和对应Swift模块。
+- Windows 桌面捕获、WinUSB 传输或构建见 [host/windows/README.md](host/windows/README.md)。平台验证脚本按系统放在 [scripts/macos/](scripts/macos/README.md) 和 [scripts/windows/](scripts/windows/README.md)。
 - 保留现有用户改动，只调整本次任务相关文件。源代码的版权、SPDX、固定上游出处和许可文件随实现保留。
 
 ## 构建与验证
