@@ -62,6 +62,27 @@ sealed class DxMonitor : IDisposable
 
 static class P4Desktop
 {
+    const int JpegQuality = 72;
+    [DllImport("GpuCapture.dll", ExactSpelling = true)]
+    static extern int jpeg444_encode(IntPtr pixels, int stride, int width, int height, int quality,
+                                     [Out] byte[] output, int capacity, out int written);
+
+    internal static int EncodeFullChroma(Bitmap frame, byte[] output)
+    {
+        var bounds = new Rectangle(0, 0, frame.Width, frame.Height);
+        var data = frame.LockBits(bounds, ImageLockMode.ReadOnly, PixelFormat.Format24bppRgb);
+        try
+        {
+            int written;
+            int hr = jpeg444_encode(data.Scan0, data.Stride, frame.Width, frame.Height, JpegQuality,
+                                    output, output.Length, out written);
+            if (hr < 0)
+                throw new IOException("JPEG 4:4:4 encode HRESULT 0x" + hr.ToString("X8"));
+            return written;
+        }
+        finally { frame.UnlockBits(data); }
+    }
+
     [DllImport("user32.dll")]
     static extern bool SetProcessDpiAwarenessContext(IntPtr mode);
     [StructLayout(LayoutKind.Sequential)]
@@ -93,14 +114,13 @@ static class P4Desktop
         return new PointF((y - area.Top) * 800f / area.Height,
                           1280f - (x - area.Left) * 1280f / area.Width);
     }
-    static int Run(string target, Rectangle area)
+    static int Run(string target, Rectangle area, string stop, int maxJpeg)
     {
         var screen = Screen.AllScreens.SingleOrDefault(d => d.DeviceName == target && !d.Primary &&
                                                             d.Bounds == area);
         if (screen == null)
             throw new InvalidOperationException("Extended output geometry changed");
         var codec = ImageCodecInfo.GetImageEncoders().Single(c => c.MimeType == "image/jpeg");
-        var stop = Local("stop.request");
         var clock = Stopwatch.StartNew();
         using (var capture = new DxMonitor(target, area))
         using (var overlay = new Bitmap(800, 1280, PixelFormat.Format32bppRgb))
@@ -108,8 +128,13 @@ static class P4Desktop
         using (var quality = new EncoderParameters(1))
         using (var mem = new MemoryStream(131072))
         using (var output = new BinaryWriter(Console.OpenStandardOutput()))
+        using (var chromaSignal = Environment.GetEnvironmentVariable(ChromaPreference.FollowApp) == "1"
+                                  ? ChromaPreference.OpenSignal() : null)
         {
-            quality.Param[0] = new EncoderParameter(System.Drawing.Imaging.Encoder.Quality, 72L);
+            quality.Param[0] = new EncoderParameter(System.Drawing.Imaging.Encoder.Quality, (long)JpegQuality);
+            bool fullChroma = chromaSignal != null && ChromaPreference.ReadFull();
+            byte[] fullBuffer = null, payload = null;
+            int payloadLength = 0;
             bool hasBase = false, lastShown = false;
             Point lastPoint = Point.Empty, hotspot = Point.Empty;
             IntPtr cachedHandle = IntPtr.Zero;
@@ -159,7 +184,14 @@ static class P4Desktop
                     }
                     lastPoint = ci.pos;
                     lastShown = shown;
-                    if (changed || pointerChanged || mem.Length == 0)
+                    if (chromaSignal != null && chromaSignal.WaitOne(0))
+                    {
+                        bool selected = ChromaPreference.ReadFull();
+                        if (selected != fullChroma)
+                            payloadLength = 0;
+                        fullChroma = selected;
+                    }
+                    if (changed || pointerChanged || payloadLength == 0)
                     {
                         Bitmap frame = capture.Image;
                         if (shown && sprite != null)
@@ -173,14 +205,25 @@ static class P4Desktop
                             paint.Flush();
                             frame = overlay;
                         }
-                        mem.Position = 0;
-                        mem.SetLength(0);
-                        frame.Save(mem, codec, quality);
+                        if (fullChroma)
+                        {
+                            if (fullBuffer == null)
+                                fullBuffer = new byte[maxJpeg];
+                            payloadLength = EncodeFullChroma(frame, fullBuffer);
+                            payload = fullBuffer;
+                        }
+                        else
+                        {
+                            mem.SetLength(0);
+                            frame.Save(mem, codec, quality);
+                            payloadLength = (int)mem.Length;
+                            payload = mem.GetBuffer();
+                        }
                     }
                     else if (clock.ElapsedMilliseconds - lastSend < 1000)
                         continue;
-                    output.Write((int)mem.Length);
-                    output.Write(mem.GetBuffer(), 0, (int)mem.Length);
+                    output.Write(payloadLength);
+                    output.Write(payload, 0, payloadLength);
                     output.Flush();
                     lastSend = clock.ElapsedMilliseconds;
                 }
@@ -200,7 +243,8 @@ static class P4Desktop
         {
             SetProcessDpiAwarenessContext(new IntPtr(-4));
             return Run(args[0], new Rectangle(int.Parse(args[1]), int.Parse(args[2]), int.Parse(args[3]),
-                                              int.Parse(args[4])));
+                                              int.Parse(args[4])), args.Length > 5 ? args[5] : Local("stop.request"),
+                       args.Length > 6 ? int.Parse(args[6]) : 768 * 1024);
         }
         catch (Exception err)
         {

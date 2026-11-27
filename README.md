@@ -14,7 +14,7 @@ P4 硬件解码 JPEG 后驱动原生 800×1280 面板。macOS App 的桌面为 1
 | --- | --- |
 | ESP-IDF 固件 | [firmware/README.md](firmware/README.md)：接线、构建、烧录、协议及各测试配置 |
 | macOS | [App 源码、构建与录屏授权](host/macos/README.md) · [启动检查与 CPU 采样](scripts/macos/README.md) |
-| Windows | [上位机源码、构建与投送](host/windows/README.md) · [UVC 实拍帧率验证](scripts/windows/README.md) |
+| Windows | [安装包、应用设置与开发说明](host/windows/README.md) · [UVC 实拍帧率验证](scripts/windows/README.md) |
 | 协作指引 | [AGENTS.md](AGENTS.md)，另提供 [agent.md](agent.md) 入口 |
 
 ```text
@@ -43,7 +43,7 @@ docs/assets/       共用的接线图与实体屏实拍
 
 ## 快速开始
 
-两端共用下面的 P4 固件。Windows 用户完成第一步后，按 [Windows 构建与启动说明](host/windows/README.md)连接扩展桌面。
+两端共用下面的 P4 固件。拿到已烧录的副屏后，Windows 用户双击 **Wireless-tag-USB-Display-Setup.exe** 安装，再用 USB 数据线连接 **HUSB** 即可。登录自启动和显示器排列都可以在应用内设置。[Windows 安装与使用](host/windows/README.md#安装与使用)
 
 ### 1. 构建并烧录固件
 

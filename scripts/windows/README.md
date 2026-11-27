@@ -2,6 +2,10 @@
 
 先编译 Windows 上位机和帧率工具，再启动扩展桌面。构建命令、依赖和会话目录见[上位机说明](../../host/windows/README.md)。
 
+在 Windows 上运行 `py -3 scripts/windows/check_app_session.py`，可用模拟设备和显示器离线检查已有扩展屏连接、首次复制模式转扩展、后台首次选择、插拔重连、布局冲突和创建失败后的清理。
+
+运行 `py -3 scripts/windows/check_chroma.py <GpuCapture.dll 的路径>` 可用合成图离线检查 4:4:4 编码、上下行序和单帧大小限制。
+
 ## 通过 UVC 摄像头测帧率
 
 保持扩展桌面运行。将 UVC 摄像头固定对准实体屏，让四角都在画面内，关闭占用摄像头的预览程序。HUSB 和摄像头由 Windows 使用，FUSB 串口交给 WSL 读取。WSL 的 Python 环境需要 NumPy 和带 `cv2.aruco.ArucoDetector`、`generateImageMarker` 的 OpenCV。

@@ -1,7 +1,9 @@
 """Bounded Windows JPEG sender. Wire layout follows firmware/main/usb_screen_protocol.h."""
 import ctypes as C
+from collections import deque
 import json
 import os
+from pathlib import Path
 import struct
 import subprocess
 import threading
@@ -26,11 +28,32 @@ def publish(path, values):
             time.sleep(0.015)
 
 
+def jpeg_chroma(jpeg):
+    """Read the sampling factors from the baseline JPEG actually being sent."""
+    pos = 2  # Skip SOI. Each segment length includes its two length bytes.
+    while pos + 4 <= len(jpeg) and jpeg[pos] == 0xFF:
+        marker = jpeg[pos + 1]
+        if marker == 0xFF:
+            pos += 1
+            continue
+        size = int.from_bytes(jpeg[pos + 2:pos + 4], "big")
+        if size < 2 or pos + 2 + size > len(jpeg) or marker in (0xDA, 0xD9):
+            break
+        if marker == 0xC0:
+            if size == 17 and jpeg[pos + 9] == 3 and jpeg[pos + 14] == jpeg[pos + 17] == 0x11:
+                return {0x11: "4:4:4", 0x21: "4:2:2", 0x22: "4:2:0"}.get(jpeg[pos + 11])
+            break
+        pos += 2 + size
+    return None
+
+
 def run(usb, handle, root, target, max_jpeg):
     stop = root / "stop.request"
-    args = [str(root / "P4Desktop.exe"), target["name"]]
+    args = [str(Path(__file__).with_name("P4Desktop.exe")), target["name"]]
     args.extend(str(target[field]) for field in ("x", "y", "width", "height"))
+    args.extend((str(stop), str(max_jpeg)))
     condition = threading.Condition()
+    pending_frames = deque()  # Same order and three-frame bound as the USB sender.
     sent = received = 0
     done = False
     errors = []
@@ -42,6 +65,7 @@ def run(usb, handle, root, target, max_jpeg):
             nonlocal received
             carry = b""
             last_presented = None
+            ack_jpeg_bytes = 0
             last_write = -1.0
             buffer = C.create_string_buffer(4096)
             try:
@@ -65,6 +89,8 @@ def run(usb, handle, root, target, max_jpeg):
                             raise OSError("P4 presentation counter jumped")
                         last_presented = presented
                         with condition:
+                            jpeg_size, chroma = pending_frames.popleft()
+                            ack_jpeg_bytes += jpeg_size
                             received += 1
                             condition.notify_all()
                         now = time.monotonic()
@@ -72,6 +98,7 @@ def run(usb, handle, root, target, max_jpeg):
                             publish(root / "stream.json", {
                                 "pid": os.getpid(), "capture_pid": capture.pid, "unix_time": time.time(),
                                 "sent": sent, "ack_ok": received, "board_received": rx,
+                                "ack_jpeg_bytes": ack_jpeg_bytes, "ack_chroma": chroma,
                                 "board_decoded": decoded, "board_presented": presented, "display": target,
                             })
                             last_write = now
@@ -103,6 +130,7 @@ def run(usb, handle, root, target, max_jpeg):
                     if errors:
                         raise errors[0]
                     sent += 1
+                    pending_frames.append((size, jpeg_chroma(jpeg)))
                     sequence = sent & SEQUENCE_MASK
                     condition.notify_all()
                 packet = FRAME.pack(b"WP4D", 1, FRAME.size, sequence, size, 800, 1280, 1, 0, zlib.crc32(jpeg), 0) + jpeg

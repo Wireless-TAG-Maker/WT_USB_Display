@@ -3,6 +3,8 @@ import ctypes as C
 from ctypes import wintypes as W
 import json
 
+ADAPTER = "USB Mobile Monitor Virtual Display"
+
 
 class DisplayDevice(C.Structure):
     _fields_ = [
@@ -32,20 +34,30 @@ user.EnumDisplaySettingsExW.argtypes = [W.LPCWSTR, W.DWORD, C.POINTER(DevMode), 
 user.ChangeDisplaySettingsExW.argtypes = [W.LPCWSTR, C.POINTER(DevMode), W.HWND, W.DWORD, C.c_void_p]
 
 
-def devs():
-    devices = []
+def adapters():
     index = 0
     while True:
         device = DisplayDevice(size=C.sizeof(DisplayDevice))
         if not user.EnumDisplayDevicesW(None, index, C.byref(device), 0):
-            break
+            return
         index += 1
+        yield device
+
+
+def is_amyuni(device):
+    return device.id.casefold() == "usbmmidd" or device.label == ADAPTER
+
+
+def devs():
+    devices = []
+    for device in adapters():
         if not device.flags & 1:  # DISPLAY_DEVICE_ATTACHED_TO_DESKTOP
             continue
         mode = DevMode(size=C.sizeof(DevMode))
         if not user.EnumDisplaySettingsExW(device.name, 0xFFFFFFFF, C.byref(mode), 0):
             raise RuntimeError("Cannot read current mode for " + device.name)
-        devices.append(dict(name=device.name, adapter=device.label, primary=bool(device.flags & 4),
+        devices.append(dict(name=device.name, adapter=ADAPTER if is_amyuni(device) else device.label,
+                            primary=bool(device.flags & 4),
                             x=mode.x, y=mode.y, width=mode.width, height=mode.height,
                             hz=mode.freq, orientation=mode.orientation))
     return sorted(devices, key=lambda d: d["name"])
@@ -61,11 +73,13 @@ def modes(name):
         index += 1
 
 
-def set_test_mode():
-    names = [d["name"] for d in devs() if d["adapter"] == "USB Mobile Monitor Virtual Display" and not d["primary"]]
+def set_test_mode(expected=None):
+    names = [d["name"] for d in devs() if d["adapter"] == ADAPTER and not d["primary"]]
     if len(names) != 1:
         raise RuntimeError("Expected one secondary Amyuni monitor")
     name, = names
+    if expected is not None and name != expected:
+        raise RuntimeError("The new Amyuni monitor changed before selecting its mode")
     available = list(modes(name))
     for width, height in ((1280, 800), (1440, 900), (1920, 1200)):
         matches = [m for m in available if (m.width, m.height, m.bpp) == (width, height, 32)]

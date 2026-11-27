@@ -103,6 +103,8 @@ def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--list", action="store_true", help="enumerate without claiming HUSB")
     parser.add_argument("--libusb", help="absolute path to 64-bit libusb-1.0.dll")
+    parser.add_argument("--session", type=Path, default=Path(__file__).resolve().parent,
+                        help="writable session directory")
     args = parser.parse_args()
     usb = USB(library_path(args.libusb))
     with usb.devices() as devices:
@@ -115,7 +117,7 @@ def main():
             raise RuntimeError(f"Expected one CAFE:4011 at HUSB, found {len(devices)}")
         target = json.loads(os.environ["WT_P4_MONITOR"])
         with usb.interface(devices[0]) as handle:
-            run(usb, handle, Path(__file__).resolve().parent, target, usb.hello(handle))
+            run(usb, handle, args.session, target, usb.hello(handle))
 
 
 if __name__ == "__main__":

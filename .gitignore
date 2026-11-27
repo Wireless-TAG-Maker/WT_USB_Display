@@ -49,9 +49,22 @@
 !/host/windows/live_sender.py
 !/host/windows/usb_stream.py
 !/host/windows/topology.py
+!/host/windows/display_paths.py
 !/host/windows/virtual_monitor.py
 !/host/windows/GpuCapture.cpp
+!/host/windows/Jpeg444.cpp
+!/host/windows/ChromaPreference.cs
 !/host/windows/P4Desktop.cs
+!/host/windows/DisplayApp.cs
+!/host/windows/DisplayMenus.cs
+!/host/windows/DisplayView.cs
+!/host/windows/DisplayView.xaml
+!/host/windows/DisplayStyles.xaml
+!/host/windows/DisplayAbout.xaml
+!/host/windows/display.ico
+!/host/windows/package.py
+!/host/windows/setup.iss
+!/host/windows/THIRD_PARTY_NOTICES.txt
 
 /scripts/*
 !/scripts/build_firmware.sh
@@ -68,6 +81,9 @@
 /scripts/windows/*
 !/scripts/windows/README.md
 !/scripts/windows/build.cmd
+!/scripts/windows/check_app_session.py
+!/scripts/windows/check_display_ui.ps1
+!/scripts/windows/check_chroma.py
 !/scripts/windows/desktop.py
 !/scripts/windows/usb_stream.py
 !/scripts/windows/fps/

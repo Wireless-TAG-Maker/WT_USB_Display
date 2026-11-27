@@ -12,7 +12,7 @@ import time
 from usb_stream import USB, library_path
 
 SOURCE = Path(__file__).resolve().parent
-RUNTIME = ("serve.py", "usb_stream.py", "live_sender.py", "topology.py", "virtual_monitor.py")
+RUNTIME = ("serve.py", "usb_stream.py", "live_sender.py", "topology.py", "display_paths.py", "virtual_monitor.py")
 
 
 def start(build, library):
