@@ -1,0 +1,15 @@
+Wireless-tag USB Display for Windows
+
+USB Mobile Monitor Virtual Display Driver 2.0.0.1
+Copyright 2014-2021 Amyuni Technologies Inc.
+Original driver package: https://www.amyuni.com/downloads/usbmmidd_v2.zip
+The installer includes Amyuni's unmodified driver and installation utility.
+See Amyuni-License.txt for the original license, including the advertising notice.
+
+Python 3.14.10 for Windows is provided by the Python Software Foundation.
+See python\LICENSE.txt in the application directory for the full notices.
+https://www.python.org/downloads/release/python-31410/
+
+libusb 1.0.30 is distributed as a separate shared library under LGPL-2.1-or-later.
+The original license and corresponding source archive are in this directory.
+https://github.com/libusb/libusb/releases/tag/v1.0.30

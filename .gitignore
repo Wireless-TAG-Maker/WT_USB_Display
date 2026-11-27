@@ -1,4 +1,4 @@
-# Publish only the two source projects, their tools and documentation.
+# Publish firmware, platform hosts, verification tools and project documentation.
 /*
 !/.gitignore
 !/README.md
@@ -40,6 +40,31 @@
 !/host/macos/THIRD_PARTY_NOTICES.md
 !/host/macos/Sources/
 !/host/macos/Checks/
+!/host/windows/
+/host/windows/*
+!/host/windows/README.md
+!/host/windows/build.cmd
+!/host/windows/desktop.py
+!/host/windows/serve.py
+!/host/windows/live_sender.py
+!/host/windows/usb_stream.py
+!/host/windows/topology.py
+!/host/windows/display_paths.py
+!/host/windows/virtual_monitor.py
+!/host/windows/GpuCapture.cpp
+!/host/windows/Jpeg444.cpp
+!/host/windows/ChromaPreference.cs
+!/host/windows/P4Desktop.cs
+!/host/windows/DisplayApp.cs
+!/host/windows/DisplayMenus.cs
+!/host/windows/DisplayView.cs
+!/host/windows/DisplayView.xaml
+!/host/windows/DisplayStyles.xaml
+!/host/windows/DisplayAbout.xaml
+!/host/windows/display.ico
+!/host/windows/package.py
+!/host/windows/setup.iss
+!/host/windows/THIRD_PARTY_NOTICES.txt
 
 /scripts/*
 !/scripts/build_firmware.sh
@@ -47,6 +72,30 @@
 !/scripts/measure_macos_cpu.py
 !/scripts/analyze_benchmark.py
 !/scripts/capture_benchmark.py
+!/scripts/macos/
+/scripts/macos/*
+!/scripts/macos/README.md
+!/scripts/macos/check_launch.sh
+!/scripts/macos/measure_cpu.py
+!/scripts/windows/
+/scripts/windows/*
+!/scripts/windows/README.md
+!/scripts/windows/build.cmd
+!/scripts/windows/check_app_session.py
+!/scripts/windows/check_display_ui.ps1
+!/scripts/windows/check_chroma.py
+!/scripts/windows/desktop.py
+!/scripts/windows/usb_stream.py
+!/scripts/windows/fps/
+/scripts/windows/fps/*
+!/scripts/windows/fps/Camera.cpp
+!/scripts/windows/fps/MotionMeter.cs
+!/scripts/windows/fps/RateChart.cs
+!/scripts/windows/fps/measure.sh
+!/scripts/windows/fps/runmeter.py
+!/scripts/windows/fps/sample.py
+!/scripts/windows/fps/analyze_camera.py
+!/scripts/windows/fps/summarize.py
 
 /docs/*
 !/docs/assets/
@@ -54,6 +103,12 @@
 !/docs/assets/README.md
 !/docs/assets/*.svg
 !/docs/assets/*.png
+!/docs/assets/macos/
+/docs/assets/macos/*
+!/docs/assets/macos/app-build.png
+!/docs/assets/macos/display-arrangement.png
+!/docs/assets/macos/extended-display.png
+!/docs/assets/macos/screen-recording.png
 
 # Generated files, local settings and credentials remain private everywhere.
 **/.DS_Store

@@ -1,6 +1,6 @@
 # WT_USB_Display 固件
 
-面向 **WT9932P4C61-TINY + WX101CH021I-40Z** 的独立 ESP-IDF 工程。主要用途是接收配套 Mac 程序发送的 JPEG，在 MIPI 屏上显示扩展桌面。首次使用优先选择下面的 `usb_display` 配置；它需要配套主机程序，主机端说明见 [macOS README](../host/macos/README.md)。
+面向 **WT9932P4C61-TINY + WX101CH021I-40Z** 的独立 ESP-IDF 工程。固件接收上位机发送的 JPEG，在 MIPI 屏上显示扩展桌面。首次使用优先选择下面的 `usb_display` 配置。主机端的构建与连接步骤见 [macOS 说明](../host/macos/README.md)和 [Windows 说明](../host/windows/README.md)。
 
 ## 硬件与连接
 
@@ -113,6 +113,7 @@ JPEG直接解码为 **RGB888/BGR24**，低地址字节顺序为B、G、R，不�
 协议唯一字段定义见 [main/usb_screen_protocol.h](main/usb_screen_protocol.h)：
 
 - 开发测试VID:PID为 **CAFE:4011**；接口0，bulk OUT `0x01`、IN `0x81`。
+- HUSB 通过 BOS 公布 Microsoft OS 2.0 描述符，Windows 可为该接口自动绑定系统自带的 WinUSB 驱动。
 - 控制请求 `0xC1/0x01` 读取32B `WP4H` HELLO。
 - 每帧为32B `WP4D`头加JPEG，所有整数小端，载荷最多768KiB；CRC为IEEE CRC32，与 `zlib crc32(0, …)` 一致。
 - JPEG必须是实际800×1280、8位baseline、单扫描YCbCr，分量ID为1/2/3；支持4:4:4/4:2:2/4:2:0。仅修改EXIF方向不能代替像素旋转。

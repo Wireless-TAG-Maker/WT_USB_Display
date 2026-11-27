@@ -5,6 +5,7 @@
 #include <stdatomic.h>
 #include <stdint.h>
 #include <string.h>
+#include <uchar.h>
 
 #include "esp_cache.h"
 #include "esp_private/esp_cache_private.h"
@@ -90,17 +91,61 @@ typedef struct {
     int64_t last_data_us;
 } parser_t;
 
+
+/* Microsoft OS 2.0 device-level descriptors for the single HUSB interface. */
+enum { MS_OS_REQUEST = 0x21 };
+typedef struct __attribute__((packed)) {
+    uint16_t length, type, data_type, name_bytes;
+    char16_t name[21];
+    uint16_t data_bytes;
+    char16_t value[40];
+} winusb_property_t;
+
+typedef struct __attribute__((packed)) {
+    uint16_t header_bytes, header_type;
+    uint32_t windows_version;
+    uint16_t total_bytes;
+    uint16_t id_bytes, id_type;
+    char compatible_id[8], sub_compatible_id[8];
+    winusb_property_t property;
+} winusb_set_t;
+
+static const winusb_set_t s_winusb_set = {
+    .header_bytes = 10, .header_type = MS_OS_20_SET_HEADER_DESCRIPTOR,
+    .windows_version = 0x06030000, .total_bytes = sizeof(winusb_set_t),
+    .id_bytes = 20, .id_type = MS_OS_20_FEATURE_COMPATBLE_ID,
+    .compatible_id = "WINUSB",
+    .property = {
+        .length = sizeof(winusb_property_t), .type = MS_OS_20_FEATURE_REG_PROPERTY,
+        .data_type = 7, /* REG_MULTI_SZ */
+        .name_bytes = sizeof(u"DeviceInterfaceGUIDs"), .name = u"DeviceInterfaceGUIDs",
+        .data_bytes = sizeof(u"{BFC14F27-3D79-4633-AC57-6852FF6299C4}\0"),
+        .value = u"{BFC14F27-3D79-4633-AC57-6852FF6299C4}\0",
+    },
+};
+_Static_assert(sizeof(winusb_set_t) == 162, "MS OS descriptor set size");
+
+static const uint8_t s_bos[] = {
+    TUD_BOS_DESCRIPTOR(TUD_BOS_DESC_LEN + TUD_BOS_MICROSOFT_OS_DESC_LEN, 1),
+    TUD_BOS_MS_OS_20_DESCRIPTOR(sizeof(s_winusb_set), MS_OS_REQUEST),
+};
+
+const uint8_t *tud_descriptor_bos_cb(void)
+{
+    return s_bos;
+}
+
 static const tusb_desc_device_t s_device_descriptor = {
     .bLength = sizeof(tusb_desc_device_t),
     .bDescriptorType = TUSB_DESC_DEVICE,
-    .bcdUSB = 0x0200,
+    .bcdUSB = 0x0210,
     .bDeviceClass = 0,
     .bDeviceSubClass = 0,
     .bDeviceProtocol = 0,
     .bMaxPacketSize0 = 64,
     .idVendor = USB_SCREEN_VID,
     .idProduct = USB_SCREEN_PID,
-    .bcdDevice = 0x0100,
+    .bcdDevice = 0x0101,
     .iManufacturer = 1,
     .iProduct = 2,
     .iSerialNumber = 3,
@@ -110,7 +155,7 @@ static const tusb_desc_device_t s_device_descriptor = {
 static const tusb_desc_device_qualifier_t s_qualifier = {
     .bLength = sizeof(tusb_desc_device_qualifier_t),
     .bDescriptorType = TUSB_DESC_DEVICE_QUALIFIER,
-    .bcdUSB = 0x0200,
+    .bcdUSB = 0x0210,
     .bDeviceClass = 0,
     .bDeviceSubClass = 0,
     .bDeviceProtocol = 0,
@@ -277,6 +322,13 @@ void tud_vendor_tx_cb(uint8_t interface, uint32_t bytes)
 bool tud_vendor_control_xfer_cb(uint8_t rhport, uint8_t stage,
                                 const tusb_control_request_t *request)
 {
+    if (request->bmRequestType == 0xC0 && request->bRequest == MS_OS_REQUEST &&
+        request->wIndex == 7 && request->wValue == 0) {
+        if (stage == CONTROL_STAGE_SETUP) {
+            return tud_control_xfer(rhport, request, (void *)&s_winusb_set, sizeof(s_winusb_set));
+        }
+        return true;
+    }
     if (request->bmRequestType != 0xC1 || request->bRequest != USB_SCREEN_REQ_HELLO ||
         request->wValue != 0 || request->wIndex != 0 || request->wLength != sizeof(s_hello)) {
         return false;
